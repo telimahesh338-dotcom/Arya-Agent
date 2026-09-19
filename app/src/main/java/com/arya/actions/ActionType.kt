@@ -85,6 +85,38 @@ sealed class ActionType {
     ) : ActionType()
 
     @Serializable
+    data class Drag(
+        val startX: Float,
+        val startY: Float,
+        val endX: Float,
+        val endY: Float,
+        val durationMs: Long = 650L
+    ) : ActionType()
+
+    @Serializable
+    data class ClearText(
+        val nodeId: String? = null,
+        val targetText: String? = null,
+        val targetX: Float? = null,
+        val targetY: Float? = null
+    ) : ActionType() {
+        val hasSemanticTarget: Boolean
+            get() = !nodeId.isNullOrBlank() || !targetText.isNullOrBlank()
+    }
+
+    @Serializable
+    data class Retry(
+        val originalAction: ActionType,
+        val attemptNumber: Int = 1,
+        val delayMs: Long = 500L
+    ) : ActionType()
+
+    @Serializable
+    data class Cancel(
+        val reason: String = "User requested cancellation"
+    ) : ActionType()
+
+    @Serializable
     data class Confirm(
         val riskLevel: RiskLevel,
         val prompt: String

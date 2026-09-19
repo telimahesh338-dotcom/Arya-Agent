@@ -141,6 +141,42 @@ class GestureController(private val context: Context) {
                     true
                 }
 
+                is ActionType.Drag -> {
+                    AryaLogger.d(TAG, "Executing drag: (${action.startX}, ${action.startY}) -> (${action.endX}, ${action.endY})")
+                    val ok = service.dispatchDrag(
+                        action.startX,
+                        action.startY,
+                        action.endX,
+                        action.endY,
+                        action.durationMs
+                    )
+                    delay(ACTION_SETTLE_MS)
+                    ok
+                }
+
+                is ActionType.ClearText -> {
+                    AryaLogger.d(TAG, "Executing clear text on nodeId=${action.nodeId}, text=${action.targetText}")
+                    val ok = service.performClearTextOnNode(
+                        nodeId = action.nodeId,
+                        targetText = action.targetText,
+                        fallbackX = action.targetX,
+                        fallbackY = action.targetY
+                    )
+                    delay(ACTION_SETTLE_MS)
+                    ok
+                }
+
+                is ActionType.Retry -> {
+                    AryaLogger.i(TAG, "Retrying action ${action.originalAction::class.simpleName} (attempt ${action.attemptNumber})")
+                    delay(action.delayMs)
+                    execute(action.originalAction)
+                }
+
+                is ActionType.Cancel -> {
+                    AryaLogger.w(TAG, "Action cancelled: ${action.reason}")
+                    false
+                }
+
                 is ActionType.Confirm,
                 is ActionType.TakeOver,
                 is ActionType.Done,

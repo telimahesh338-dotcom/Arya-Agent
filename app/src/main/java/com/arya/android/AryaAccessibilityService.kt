@@ -331,6 +331,38 @@ class AryaAccessibilityService : AccessibilityService() {
     }
 
     /**
+     * Clears text on the target editable node or currently focused node.
+     */
+    suspend fun performClearTextOnNode(
+        nodeId: String? = null,
+        targetText: String? = null,
+        fallbackX: Float? = null,
+        fallbackY: Float? = null
+    ): Boolean {
+        AryaLogger.d(TAG, "performClearTextOnNode: id=$nodeId, text=$targetText")
+        return performSetTextOnNode("", nodeId, targetText, fallbackX, fallbackY)
+    }
+
+    /**
+     * Dispatches a sustained drag gesture between screen coordinates.
+     */
+    suspend fun dispatchDrag(
+        startX: Float,
+        startY: Float,
+        endX: Float,
+        endY: Float,
+        durationMs: Long = 650L
+    ): Boolean {
+        val path = Path().apply {
+            moveTo(startX, startY)
+            lineTo(endX, endY)
+        }
+        val stroke = GestureDescription.StrokeDescription(path, 0, durationMs)
+        val gesture = GestureDescription.Builder().addStroke(stroke).build()
+        return dispatchGestureSuspending(gesture)
+    }
+
+    /**
      * Performs a scroll on the target scrollable node or active window.
      * Prefers native ACTION_SCROLL_FORWARD/BACKWARD, falling back to gesture swipe.
      */
