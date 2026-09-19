@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import com.arya.AryaApplication
 import com.arya.actions.ScrollDirection
 import com.arya.diagnostics.AryaLogger
 import com.arya.perception.AccessibilityReader

@@ -5,6 +5,7 @@ import com.arya.android.AryaAccessibilityService
 import com.arya.diagnostics.AryaLogger
 import com.arya.grounding.GroundedTarget
 import com.arya.perception.ScreenChangeDetector
+import com.arya.perception.ScreenState
 import com.arya.security.RiskClassifier
 import com.arya.security.RiskEvaluation
 import com.arya.security.RiskLevel

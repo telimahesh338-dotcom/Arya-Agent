@@ -23,7 +23,7 @@ class MemoryGate {
 
     private val sensitivePatterns = listOf(
         Pattern.compile("(password|passwd|pin|secret|cvv)\\s*[:=]?\\s*['\"]?([^'\"\\s]+)", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("\\b(?:\\d{4}[ -]?){3}\d{4}\\b") // Credit cards
+        Pattern.compile("\\b(?:\\d{4}[ -]?){3}\\d{4}\\b") // Credit cards
     )
 
     private val preferenceMarkers = listOf(

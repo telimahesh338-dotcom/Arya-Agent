@@ -15,6 +15,7 @@ import com.arya.memory.MemoryStore
 import com.arya.perception.ChangeLevel
 import com.arya.perception.ScreenChangeDetector
 import com.arya.perception.ScreenState
+import com.arya.perception.ocr.OcrBlock
 import com.arya.perception.ocr.OcrEngine
 import com.arya.perception.vision.VisionEngine
 import com.arya.planner.PlanStatus
@@ -171,7 +172,7 @@ class AgentEngine(
             broker.updateTelemetry { it.copy(activePackage = currentScreen.packageName) }
 
             // STAGE 2: UNDERSTAND
-            val ocrBlocks = if (currentScreen.nodes.size < 5) {
+            val ocrBlocks: List<OcrBlock> = if (currentScreen.nodes.size < 5) {
                 broker.log("Perception Tier 2: Accessibility hierarchy sparse. Engaging OCR.")
                 emptyList()
             } else {
