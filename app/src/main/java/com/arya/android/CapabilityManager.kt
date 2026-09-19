@@ -21,6 +21,7 @@ data class DeviceCapabilities(
     val hasOverlayPermission: Boolean = false,
     val hasRecordAudio: Boolean = false,
     val hasPostNotifications: Boolean = false,
+    val hasNotificationAccess: Boolean = false,
     val hasMediaProjectionReady: Boolean = false,
     val isShizukuAvailable: Boolean = false,
     val hasRootAccess: Boolean = false
@@ -53,6 +54,7 @@ class CapabilityManager(private val context: Context) {
         } else {
             true
         }
+        val hasNotifAccess = checkNotificationListenerEnabled()
         val isShizuku = checkShizukuAvailable()
         val hasRoot = checkRootAvailable()
 
@@ -61,6 +63,7 @@ class CapabilityManager(private val context: Context) {
             hasOverlayPermission = hasOverlay,
             hasRecordAudio = hasAudio,
             hasPostNotifications = hasNotifications,
+            hasNotificationAccess = hasNotifAccess,
             isShizukuAvailable = isShizuku,
             hasRootAccess = hasRoot
         )
@@ -83,6 +86,15 @@ class CapabilityManager(private val context: Context) {
             val clz = Class.forName("dev.rikka.shizuku.Shizuku")
             val ping = clz.getMethod("pingBinder")
             ping.invoke(null) as? Boolean ?: false
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
+    private fun checkNotificationListenerEnabled(): Boolean {
+        return try {
+            val flat = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+            flat?.contains(context.packageName) == true
         } catch (_: Throwable) {
             false
         }
