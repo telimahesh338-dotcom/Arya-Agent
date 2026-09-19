@@ -5,6 +5,8 @@ import com.arya.actions.ActionEngine
 import com.arya.actions.ActionType
 import com.arya.android.AryaAccessibilityService
 import com.arya.perception.ScreenCaptureService
+import com.arya.perception.ScreenChangeDetector
+import com.arya.perception.ScreenState
 import com.arya.security.RiskClassifier
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +27,8 @@ class AgentEngine(
 ) {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var currentTaskJob: Job? = null
+    private val changeDetector = ScreenChangeDetector()
+    private var lastScreenState: ScreenState? = null
 
     fun startTask(goal: String, delaySeconds: Int = 0) {
         currentTaskJob?.cancel()
@@ -70,10 +74,22 @@ class AgentEngine(
             broker.updateTelemetry { it.copy(stepCount = currentStep) }
             broker.log("--- Step $currentStep of $maxSteps ---")
 
-            // 1. OBSERVE & UNDERSTAND
-            val currentPkg = AryaAccessibilityService.instance?.activePackage?.value ?: "unknown"
-            broker.updateTelemetry { it.copy(activePackage = currentPkg) }
-            broker.log("Active package: $currentPkg")
+            // 1. OBSERVE & UNDERSTAND (Phase 2 Accessibility Core)
+            val service = AryaAccessibilityService.instance
+            if (service == null || !service.isConnected.value) {
+                broker.setStatus(AgentRunStatus.FAILED, "Accessibility Service disconnected.")
+                return
+            }
+
+            val screenState = service.captureScreenState()
+            broker.updateTelemetry { it.copy(activePackage = screenState.packageName) }
+            broker.log("Observed screen: ${screenState.packageName} (${screenState.actionableNodes.size} interactive targets)")
+
+            val diff = changeDetector.detectChange(lastScreenState, screenState)
+            if (lastScreenState != null) {
+                broker.log("UI Change (${diff.changeLevel}): ${diff.summary}")
+            }
+            lastScreenState = screenState
 
             // Check for injected user steering
             val steering = broker.consumeSteering()
@@ -82,16 +98,8 @@ class AgentEngine(
                 broker.acknowledgeSteering()
             }
 
-            // In Phase 1 architecture shell, simulate a verification check:
-            // The accessibility service readiness is validated.
-            val a11yReady = AryaAccessibilityService.instance?.isConnected?.value == true
-            if (!a11yReady) {
-                broker.setStatus(AgentRunStatus.FAILED, "Accessibility Service disconnected.")
-                return
-            }
-
-            // For foundation validation, complete single-step demonstration
-            broker.setStatus(AgentRunStatus.COMPLETED, "Foundation Shell operational. Task initialized: $goal")
+            // Phase 2 Accessibility Core verification complete
+            broker.setStatus(AgentRunStatus.COMPLETED, "Accessibility Core operational. Screen parsed: ${screenState.actionableNodes.size} nodes.")
             break
         }
 

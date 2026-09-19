@@ -9,24 +9,35 @@ enum class ScrollDirection {
 
 /**
  * Sealed hierarchy of all discrete actions executable by ARYA.
+ * Supports both Semantic Node Targeting (preferred) and Coordinate Fallback.
  */
 @Serializable
 sealed class ActionType {
 
     @Serializable
     data class Tap(
-        val x: Float,
-        val y: Float,
+        val nodeId: String? = null,
+        val targetText: String? = null,
         val legendId: Int? = null,
+        val x: Float = 0f,
+        val y: Float = 0f,
         val label: String? = null
-    ) : ActionType()
+    ) : ActionType() {
+        val hasSemanticTarget: Boolean
+            get() = !nodeId.isNullOrBlank() || !targetText.isNullOrBlank() || legendId != null
+    }
 
     @Serializable
     data class LongTap(
-        val x: Float,
-        val y: Float,
+        val nodeId: String? = null,
+        val targetText: String? = null,
+        val x: Float = 0f,
+        val y: Float = 0f,
         val durationMs: Long = 800L
-    ) : ActionType()
+    ) : ActionType() {
+        val hasSemanticTarget: Boolean
+            get() = !nodeId.isNullOrBlank() || !targetText.isNullOrBlank()
+    }
 
     @Serializable
     data class Swipe(
@@ -40,16 +51,22 @@ sealed class ActionType {
     @Serializable
     data class Scroll(
         val direction: ScrollDirection = ScrollDirection.DOWN,
+        val nodeId: String? = null,
         val distanceFraction: Float = 0.5f
     ) : ActionType()
 
     @Serializable
     data class TypeText(
         val text: String,
+        val nodeId: String? = null,
+        val targetText: String? = null,
         val targetX: Float? = null,
         val targetY: Float? = null,
         val pressEnter: Boolean = false
-    ) : ActionType()
+    ) : ActionType() {
+        val hasSemanticTarget: Boolean
+            get() = !nodeId.isNullOrBlank() || !targetText.isNullOrBlank()
+    }
 
     @Serializable
     data object PressBack : ActionType()

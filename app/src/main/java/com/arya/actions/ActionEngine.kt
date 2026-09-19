@@ -36,13 +36,20 @@ class ActionEngine(
         val risk = riskClassifier.evaluate(action, goalContext)
 
         if (risk.requiresApproval && !userApproved) {
-            // Must pause for human approval
+            AryaLogger.w("ActionEngine", "Action requires human approval: ${risk.reason} (Risk: ${risk.level})")
             return Pair(false, risk)
         }
 
+        AryaLogger.i("ActionEngine", "Dispatching action: $action")
         val startTime = System.currentTimeMillis()
-        val success = gestureController.execute(action)
+        val success = try {
+            gestureController.execute(action)
+        } catch (t: Throwable) {
+            AryaLogger.e("ActionEngine", "Gesture execution failed with exception: ${t.message}", t)
+            false
+        }
         val duration = System.currentTimeMillis() - startTime
+        AryaLogger.i("ActionEngine", "Action execution completed in ${duration}ms (success=$success)")
 
         val record = ActionExecutionRecord(
             action = action,
