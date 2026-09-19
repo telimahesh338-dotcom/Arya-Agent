@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARYA</string>
+    <string name="accessibility_service_name">ARYA Operator Service</string>
+    <string name="accessibility_service_description">ARYA digital operator accessibility service. Reads screen UI elements and dispatches precise gestures to assist users autonomously.</string>
+    <string name="notification_channel_name">ARYA Background Execution</string>
+    <string name="notification_channel_desc">Active foreground service notification while ARYA controls the device.</string>
+</resources>
