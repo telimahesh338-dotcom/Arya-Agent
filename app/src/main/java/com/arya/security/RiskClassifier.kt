@@ -81,6 +81,18 @@ class RiskClassifier {
                     RiskEvaluation(RiskLevel.LOW, false, "Standard UI interaction")
                 }
             }
+            is ActionType.ClearText -> {
+                RiskEvaluation(RiskLevel.LOW, false, "Clearing text entry field")
+            }
+            is ActionType.Drag -> {
+                RiskEvaluation(RiskLevel.LOW, false, "Standard drag gesture")
+            }
+            is ActionType.Retry -> {
+                evaluate(action.originalAction, goalContext)
+            }
+            is ActionType.Cancel -> {
+                RiskEvaluation(RiskLevel.LOW, false, "Operator cancellation signal")
+            }
             is ActionType.PressBack,
             is ActionType.PressHome,
             is ActionType.Scroll,
