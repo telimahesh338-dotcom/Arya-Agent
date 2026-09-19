@@ -15,8 +15,13 @@ data class ScreenState(
     val nodes: List<UiNode> = emptyList(),
     val isKeyboardVisible: Boolean = false,
     val isDialogShowing: Boolean = false,
+    val isLoading: Boolean = false,
+    val confidence: Float = 1.0f,
+    val orientation: Int = 1,
     val screenWidth: Int = 1080,
-    val screenHeight: Int = 2400
+    val screenHeight: Int = 2400,
+    val screenshotMetadata: ScreenshotMetadata? = null,
+    val visualHash: String? = null
 ) {
     val actionableNodes: List<UiNode> by lazy {
         nodes.filter { it.isActionable }
