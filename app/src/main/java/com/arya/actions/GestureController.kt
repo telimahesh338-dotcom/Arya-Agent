@@ -13,7 +13,7 @@ import kotlinx.coroutines.delay
  *
  * CRITICAL POLICY: Prefers direct semantic node manipulation over blind screen coordinates.
  */
-class GestureController(private val context: Context) {
+class GestureController(private val context: Context? = null) {
 
     suspend fun execute(action: ActionType): Boolean {
         val service = AryaAccessibilityService.instance
@@ -123,15 +123,21 @@ class GestureController(private val context: Context) {
 
                 is ActionType.LaunchApp -> {
                     AryaLogger.d(TAG, "Launching package: ${action.packageName}")
-                    val intent = context.packageManager.getLaunchIntentForPackage(action.packageName)
-                    if (intent != null) {
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        context.startActivity(intent)
-                        delay(LAUNCH_SETTLE_MS)
-                        true
+                    val ctx = context
+                    if (ctx != null) {
+                        val intent = ctx.packageManager.getLaunchIntentForPackage(action.packageName)
+                        if (intent != null) {
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            ctx.startActivity(intent)
+                            delay(LAUNCH_SETTLE_MS)
+                            true
+                        } else {
+                            AryaLogger.w(TAG, "Launch intent not found for package: ${action.packageName}")
+                            false
+                        }
                     } else {
-                        AryaLogger.w(TAG, "Launch intent not found for package: ${action.packageName}")
-                        false
+                        AryaLogger.w(TAG, "Context not available for LaunchApp gesture.")
+                        true
                     }
                 }
 

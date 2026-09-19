@@ -28,7 +28,7 @@ data class ActionExecutionRecord(
  * Never assumes success without visual / accessibility verification.
  */
 class ActionEngine(
-    context: Context,
+    context: Context? = null,
     private val riskClassifier: RiskClassifier = RiskClassifier(),
     private val gestureController: GestureController = GestureController(context),
     private val changeDetector: ScreenChangeDetector = ScreenChangeDetector()
@@ -90,7 +90,8 @@ class ActionEngine(
         val postHash = postState?.structuralHash
 
         // Compute difference
-        val diff = changeDetector.detectChange(preState, postState ?: preState!!)
+        val effectivePostState = postState ?: preState ?: ScreenState(packageName = "unknown")
+        val diff = changeDetector.detectChange(preState, effectivePostState)
 
         val result = ActionResult(
             action = action,
