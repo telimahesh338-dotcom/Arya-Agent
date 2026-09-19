@@ -51,7 +51,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 
 # ML Kit (On-Device Local OCR)
-mlkit-text-recognition = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition", version.ref = "mlkitText" }
+mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitText" }
 
 # Optional Privileged Access (Shizuku)
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
